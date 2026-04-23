@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>From Zade 🌸</title>
+    <title>Dear Sun 🌸</title>
     <meta name="description" content="Made with love — especially for you.">
     <link rel="icon" type="image/x-icon" href="https://cdn.jsdelivr.net/gh/sun0225SUN/photos/img/20210715233345.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -107,9 +107,9 @@
             100% { transform: scale(1)   rotate(0deg);  opacity: 1; }
         }
         @keyframes pop-out {
-            0%   { transform: scale(1)   rotate(0deg);  opacity: 1; }
-            40%  { transform: scale(1.2) rotate(8deg);  opacity: .8; }
-            100% { transform: scale(0)   rotate(-20deg); opacity: 0; }
+            0%   { transform: scale(1)   rotate(0deg);   opacity: 1; }
+            40%  { transform: scale(1.25) rotate(10deg); opacity: 0.7; }
+            100% { transform: scale(0)   rotate(-25deg); opacity: 0; }
         }
 
         /* footer */
@@ -292,29 +292,38 @@
 <script>
 'use strict';
 
-/* ── refs ── */
+/* ════════════════════════════════════════
+   SEQUENCE (loops forever):
+   1. GIF plays for 10 sec (always visible, never hidden)
+   2. Heart builds block by block (~6 sec)
+   3. Heart glows 1 sec
+   4. Heart disassembles block by block (reverse, ~3 sec)
+   5. Footer "made with love" fades in after first round
+   6. Back to step 1
+   ════════════════════════════════════════ */
+
 const bgm      = document.getElementById('bgm');
 const musicBtn = document.getElementById('musicBtn');
 const loveEl   = document.getElementById('love');
 const tpl      = document.getElementById('tpl-block');
 
-/* ── grid constants ── */
 const COLS = 13, ROWS = 11;
+let   recipientName = '';
+let   footerShown   = false;
+let   loopRunning   = false;
 
+/* ── cell / layout ── */
 function cellSize() {
     const maxW = Math.floor(window.innerWidth  * 0.88 / COLS);
     const maxH = Math.floor(window.innerHeight * 0.54 / ROWS);
     return Math.min(maxW, maxH, 40);
 }
-
 function applyLayout() {
     const C = cellSize();
-    const W = COLS * C, H = ROWS * C;
-    loveEl.style.cssText = `width:${W}px;height:${H}px;left:50%;top:50%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 20px rgba(232,88,122,.35));`;
+    loveEl.style.width  = (COLS * C) + 'px';
+    loveEl.style.height = (ROWS * C) + 'px';
     loveEl.dataset.cell = C;
-    // size all block-divs
     loveEl.querySelectorAll('.block div').forEach(d => { d.style.width = d.style.height = C + 'px'; });
-
     const gif = Math.min(Math.max(Math.round(window.innerWidth * .24), 76), 170);
     const gw  = document.getElementById('gif-wrap');
     gw.style.width = gw.style.height = gif + 'px';
@@ -325,10 +334,10 @@ applyLayout();
 /* ── petals ── */
 (function() {
     const cont = document.getElementById('petals');
-    ['🌸','🌺','💮','🌷','✿','❀','🌼'].forEach((e, i) => {
+    ['🌸','🌺','💮','🌷','✿','❀','🌼'].forEach(e => {
         for (let j = 0; j < 3; j++) {
             const p = document.createElement('span');
-            p.className = 'petal';
+            p.className  = 'petal';
             p.textContent = e;
             const sz = 10 + Math.random() * 13;
             p.style.cssText = `left:${Math.random()*100}%;font-size:${sz}px;animation-duration:${8+Math.random()*11}s;animation-delay:${Math.random()*22}s;`;
@@ -339,15 +348,8 @@ applyLayout();
 
 /* ── music ── */
 musicBtn.addEventListener('click', () => {
-    if (bgm.paused) {
-        bgm.play().catch(() => {});
-        musicBtn.textContent = '🎵';
-        musicBtn.classList.remove('paused');
-    } else {
-        bgm.pause();
-        musicBtn.textContent = '🔇';
-        musicBtn.classList.add('paused');
-    }
+    if (bgm.paused) { bgm.play().catch(()=>{}); musicBtn.textContent='🎵'; musicBtn.classList.remove('paused'); }
+    else            { bgm.pause();               musicBtn.textContent='🔇'; musicBtn.classList.add('paused');    }
 });
 
 /* ── name screen ── */
@@ -362,42 +364,30 @@ musicBtn.addEventListener('click', () => {
         if (!name) {
             hint.textContent = 'please enter a name first 🌸';
             hint.classList.add('error');
-            input.classList.remove('shake');
-            void input.offsetWidth;
-            input.classList.add('shake');
-            input.addEventListener('animationend', () => input.classList.remove('shake'), { once: true });
-            input.focus();
-            return;
+            input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
+            input.addEventListener('animationend', () => input.classList.remove('shake'), { once:true });
+            input.focus(); return;
         }
-
+        recipientName = name;
         document.getElementById('main-title').textContent = 'Dear ' + name;
         document.title = 'Dear ' + name + ' 🌸';
-        setFooterName(name);
 
         screen.classList.add('hide');
-        screen.addEventListener('transitionend', () => screen.remove(), { once: true });
+        screen.addEventListener('transitionend', () => screen.remove(), { once:true });
 
-        bgm.play().then(() => {
-            musicBtn.textContent = '🎵';
-            musicBtn.classList.remove('paused');
-        }).catch(() => {});
+        bgm.play().then(() => { musicBtn.textContent='🎵'; musicBtn.classList.remove('paused'); }).catch(()=>{});
 
-        // Wait 1 second after name entry, then begin the loop
-        setTimeout(() => beginLoop(), 1000);
+        // 1 second after name entry → begin loop
+        setTimeout(beginLoop, 1000);
     }
 
     btn.addEventListener('click', submit);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
-    input.addEventListener('input', () => { hint.textContent = '\u00a0'; hint.classList.remove('error'); });
-    window.addEventListener('load', () => { try { input.focus(); } catch(e){} }, { once: true });
+    input.addEventListener('keydown', e => { if (e.key==='Enter') submit(); });
+    input.addEventListener('input',   () => { hint.textContent='\u00a0'; hint.classList.remove('error'); });
+    window.addEventListener('load',   () => { try { input.focus(); } catch(e){} }, { once:true });
 })();
 
-function setFooterName(name) {
-    document.getElementById('footer-credit').innerHTML =
-        `made with <span class="heart-icon">♥</span> by <span class="name">Zade</span> &nbsp;—&nbsp; especially for <span class="name">${name}</span> 🌸`;
-}
-
-/* ── heart data ── */
+/* ════════════ HEART DATA ════════════ */
 const blk_pitn = {
     block1:[[0,1],[0,0],[-1,0],[-1,-1]], block2:[[0,1],[0,0],[-1,0],[0,-1]],
     block3:[[-1,1],[0,0],[-1,0],[-1,-1]], block4:[[0,1],[0,0],[-1,0],[-1,-1]],
@@ -420,74 +410,77 @@ const offset_pitn = {
     block19:[-4,0], block20:[-3,5], block21:[-5,3], block22:[-4,1], block23:[-6,1]
 };
 
-let mainTimer = null;
-let cycleCount = 0;   // tracks how many full cycles have run (used to increase build time)
-
-/* ════════════════════════════════════════════════
-   MAIN LOOP
-   Phase 1 → GIF plays (duration grows each cycle)
-   Phase 2 → Heart builds (≥5s, grows each cycle)
-   Phase 3 → Heart disappears (reverse-pop)
-   Phase 4 → back to Phase 1
-   ════════════════════════════════════════════════ */
+/* ════════════ LOOP ENTRY ════════════ */
 function beginLoop() {
-    runGifPhase();
+    if (loopRunning) return;
+    loopRunning = true;
+    phaseGif();
 }
 
-/* ── GIF phase ──
-   GIF is always visible. We just let it "play" for gifDuration ms, then kick off heart.
-   Duration increases by 0.5s each cycle (base = 3s). */
-function runGifPhase() {
+/* ════════════ PHASE 1 — GIF (10 sec) ════════════
+   GIF is ALWAYS visible. We just wait 10 seconds then
+   move to heart. Restart gif animation by re-setting src. */
+function phaseGif() {
+    // Ensure heart is hidden / cleared before gif phase
+    hideHeart();
+
     const gifWrap = document.getElementById('gif-wrap');
-    gifWrap.style.opacity = '1';          // always visible
+    gifWrap.style.opacity    = '1';
     gifWrap.style.transition = '';
 
-    // Restart gif by cloning the img src
+    // Bounce animation already on gif via CSS — just reset src to restart gif
     const img = gifWrap.querySelector('img');
-    const src = img.src;
-    img.src = '';
-    img.src = src;
+    const src = img.getAttribute('src');
+    img.setAttribute('src', '');
+    requestAnimationFrame(() => { img.setAttribute('src', src); });
 
-    const gifDuration = 3000 + cycleCount * 500;  // grows 0.5s per cycle
-
-    setTimeout(() => {
-        runHeartPhase();
-    }, gifDuration);
+    setTimeout(() => phaseHeartBuild(), 10000);
 }
 
-/* ── Heart BUILD phase ──
-   23 blocks over heartDuration ms (min 5000ms, grows 600ms per cycle) */
-function runHeartPhase() {
-    clearHeartBlocks();
+/* ════════════ PHASE 2 — HEART BUILDS ════════════
+   23 blocks appear one by one over ~6 seconds. */
+function phaseHeartBuild() {
+    clearHeartDOM();
     applyLayout();
-    loveEl.style.opacity    = '1';
-    loveEl.style.filter     = 'drop-shadow(0 0 20px rgba(232,88,122,.35))';
-    loveEl.style.transition = '';
-    loveEl.style.transform  = 'translate(-50%,-50%)';
 
-    const C = parseInt(loveEl.dataset.cell) || cellSize();
+    // Re-centre the love container
+    loveEl.style.cssText = `
+        position:absolute;
+        width:${COLS * cellSize()}px;
+        height:${ROWS * cellSize()}px;
+        left:50%; top:50%;
+        transform:translate(-50%,-50%);
+        filter:drop-shadow(0 0 20px rgba(232,88,122,.35));
+        opacity:1;
+        transition:none;
+    `;
+    loveEl.dataset.cell = cellSize();
+
+    const C = cellSize();
+
+    // Reset template block
+    tpl.style.cssText    = 'visibility:hidden;position:absolute;';
+    tpl.style.display    = '';
+    tpl.children[2].style.display = '';
+    Array.from(tpl.children).forEach(ch => { ch.style.animation = ''; ch.style.display = ''; });
 
     tpl.style.top    = '50%';
     tpl.style.left   = '50%';
     tpl.style.margin = `-${Math.round(C/2)}px 0 0 -${Math.round(C/2)}px`;
-    tpl.style.visibility = 'hidden';
-    tpl.style.display    = '';
-    tpl.children[2].style.display = '';
 
     const blk_left = parseFloat(getComputedStyle(tpl).left);
     const blk_top  = parseFloat(getComputedStyle(tpl).top);
 
-    const heartDuration = 5000 + cycleCount * 600;  // grows 0.6s per cycle
-    const interval = Math.floor(heartDuration / 23);
+    const TOTAL_BLOCKS  = 23;
+    const BUILD_TIME_MS = 6000;
+    const INTERVAL      = Math.floor(BUILD_TIME_MS / TOTAL_BLOCKS); // ~260ms per block
 
     let idx = 0;
-
-    mainTimer = setInterval(() => {
-        if (++idx >= 24) {
-            clearInterval(mainTimer);
-            mainTimer = null;
-            // Heart fully built — glow, then dissolve
-            setTimeout(() => heartGlowThenDissolve(), 800);
+    const buildTimer = setInterval(() => {
+        idx++;
+        if (idx > TOTAL_BLOCKS) {
+            clearInterval(buildTimer);
+            phaseHeartGlow();
             return;
         }
 
@@ -497,71 +490,102 @@ function runHeartPhase() {
 
         for (let i = 0; i < tpl.children.length; i++) {
             const ch = tpl.children[i];
-            ch.style.width  = C + 'px';
-            ch.style.height = C + 'px';
+            ch.style.width  = C + 'px'; ch.style.height = C + 'px';
             ch.style.left   = blk_pitn['block'+idx][i][0] * -C + 'px';
             ch.style.top    = blk_pitn['block'+idx][i][1] * -C + 'px';
             ch.style.animation = 'none';
             void ch.offsetWidth;
-            ch.style.animation = `pop-in .45s cubic-bezier(.34,1.56,.64,1) ${(i*0.06).toFixed(2)}s both`;
+            ch.style.animation = `pop-in .45s cubic-bezier(.34,1.56,.64,1) ${(i * 0.06).toFixed(2)}s both`;
         }
 
-        const clone = tpl.cloneNode(true);
-        loveEl.appendChild(clone);
+        loveEl.appendChild(tpl.cloneNode(true));
 
-        const allBlocks = loveEl.querySelectorAll('.block');
-        if (allBlocks.length >= 23) {
+        // Hide template on last block
+        if (idx >= TOTAL_BLOCKS) {
             tpl.children[2].style.display = 'none';
             tpl.style.display = 'none';
         }
-    }, interval);
+    }, INTERVAL);
 }
 
-/* ── Heart DISSOLVE phase ──
-   Fade out each block in reverse order (last built → first), same way they popped in */
-function heartGlowThenDissolve() {
-    loveEl.style.transition = 'filter .4s';
-    loveEl.style.filter     = 'drop-shadow(0 0 48px rgba(232,88,122,.85))';
-
-    setTimeout(() => {
-        const blocks = Array.from(loveEl.querySelectorAll('.block')).filter(b => b.id !== 'tpl-block');
-        const total  = blocks.length;
-        const dissolveInterval = Math.max(60, Math.floor(1800 / total));
-
-        let i = total - 1;
-        const dissolveTimer = setInterval(() => {
-            if (i < 0) {
-                clearInterval(dissolveTimer);
-                // All gone — move to next cycle
-                cycleCount++;
-                setTimeout(() => runGifPhase(), 400);
-                return;
-            }
-            const blk = blocks[i];
-            Array.from(blk.children).forEach((ch, ci) => {
-                ch.style.animation = 'none';
-                void ch.offsetWidth;
-                ch.style.animation = `pop-out .35s cubic-bezier(.36,0,.66,.19) ${(ci * 0.05).toFixed(2)}s forwards`;
-            });
-            setTimeout(() => { try { blk.remove(); } catch(e){} }, 400);
-            i--;
-        }, dissolveInterval);
-    }, 600);
+/* ════════════ PHASE 3 — HEART GLOWS (1 sec) ════════════ */
+function phaseHeartGlow() {
+    loveEl.style.transition = 'filter .5s';
+    loveEl.style.filter     = 'drop-shadow(0 0 50px rgba(232,88,122,.9))';
+    setTimeout(() => phaseHeartDisassemble(), 1000);
 }
 
-/* ── helpers ── */
-function clearHeartBlocks() {
-    if (mainTimer) { clearInterval(mainTimer); mainTimer = null; }
+/* ════════════ PHASE 4 — HEART DISASSEMBLES ════════════
+   Blocks pop out in reverse order (last built → first). */
+function phaseHeartDisassemble() {
+    const blocks = Array.from(loveEl.querySelectorAll('.block')).filter(b => b.id !== 'tpl-block');
+    const total  = blocks.length;
+    if (total === 0) { phaseFooter(); return; }
+
+    const DISASSEMBLE_MS = 3000;
+    const step           = Math.floor(DISASSEMBLE_MS / total);
+
+    let i = total - 1;
+    const timer = setInterval(() => {
+        if (i < 0) {
+            clearInterval(timer);
+            phaseFooter();
+            return;
+        }
+        const blk = blocks[i];
+        Array.from(blk.children).forEach((ch, ci) => {
+            ch.style.animation = 'none';
+            void ch.offsetWidth;
+            ch.style.animation = `pop-out .4s cubic-bezier(.36,0,.66,.19) ${(ci * 0.05).toFixed(2)}s forwards`;
+        });
+        setTimeout(() => { try { blk.remove(); } catch(e){} }, 500);
+        i--;
+    }, step);
+}
+
+/* ════════════ PHASE 5 — FOOTER (after first round) ════════════ */
+function phaseFooter() {
+    if (!footerShown) {
+        footerShown = true;
+        showFooter();
+        // Wait for footer to animate then restart
+        setTimeout(() => { phaseGif(); }, 3500);
+    } else {
+        // Footer already shown — just restart after brief pause
+        setTimeout(() => { phaseGif(); }, 800);
+    }
+}
+
+function showFooter() {
+    const credit = document.getElementById('footer-credit');
+    credit.innerHTML = `made with <span class="heart-icon">♥</span> by <span class="name">Zade</span> &nbsp;—&nbsp; especially for <span class="name">${recipientName}</span> 🌸`;
+
+    const lb = document.getElementById('line-black');
+    const lr = document.getElementById('line-red');
+
+    // Force reflow to restart animations
+    lb.classList.remove('run'); lr.classList.remove('run'); credit.classList.remove('run');
+    credit.style.opacity = '0';
+    void lb.offsetWidth;
+    lb.classList.add('run');
+    lr.classList.add('run');
+    credit.classList.add('run');
+}
+
+/* ════════════ HELPERS ════════════ */
+function hideHeart() {
+    loveEl.style.opacity = '0';
+}
+function clearHeartDOM() {
     Array.from(loveEl.querySelectorAll('.block')).forEach(b => {
         if (b.id !== 'tpl-block') b.remove();
     });
     tpl.style.cssText = 'visibility:hidden;position:absolute;';
+    tpl.style.display = '';
     tpl.children[2].style.display = '';
-    Array.from(tpl.children).forEach(ch => {
-        ch.style.animation = '';
-        ch.style.animationName = '';
-        ch.style.display = '';
-    });
+    Array.from(tpl.children).forEach(ch => { ch.style.animation=''; ch.style.display=''; });
+    loveEl.style.filter = 'drop-shadow(0 0 20px rgba(232,88,122,.35))';
+    loveEl.style.transition = '';
 }
 </script>
 </body>
