@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dear Sun 🌸</title>
+    <meta name="description" content="Made with love — your star is my motivation to keep going.">
+    <link rel="icon" type="image/x-icon" href="https://cdn.jsdelivr.net/gh/sun0225SUN/photos/img/20210715233345.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+
+    <style>
+        /* ── Reset ── */
+        *, *::before, *::after { margin: 0; padding: 0; border: 0; box-sizing: border-box; }
+
+        /* ── Variables ── */
+        :root {
+            --rose:    #e8587a;
+            --rose-lt: #f9b8c8;
+            --cream:   #fff8f4;
+            --ink:     #3a1a25;
+            --gold:    #e8a87c;
+        }
+
+        /* ── Base ── */
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: var(--cream);
+            font-family: 'Lora', serif;
+            color: var(--ink);
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ctext y='18' font-size='18'%3E🌸%3C/text%3E%3C/svg%3E"), auto;
+        }
+
+        /* ── Soft gradient background ── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 20% 80%, rgba(232,88,122,.13) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(249,184,200,.18) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 80% at 50% 50%, rgba(232,168,124,.08) 0%, transparent 80%);
+            pointer-events: none;
+        }
+
+        /* ── Floating petals ── */
+        .petals { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .petal {
+            position: absolute;
+            font-size: clamp(10px, 2vw, 22px);
+            opacity: 0;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0%   { opacity: 0; transform: translateY(-40px) rotate(0deg); }
+            10%  { opacity: .65; }
+            90%  { opacity: .45; }
+            100% { opacity: 0;  transform: translateY(110vh) rotate(540deg); }
+        }
+
+        /* ── Container ── */
+        .container {
+            width: 100%; height: 100%;
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* ── GIF character ── */
+        .body_left {
+            width: 240px; height: 240px;
+            left: 0; bottom: 90px;
+            position: absolute;
+            z-index: 98;
+            filter: drop-shadow(0 8px 24px rgba(232,88,122,.25));
+            animation: float 4s ease-in-out infinite;
+        }
+        .body_left img { width: 100%; height: 100%; object-fit: contain; }
+
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-14px); }
+        }
+
+        /* ── Heart grid ── */
+        .love {
+            width: 520px; height: 440px;
+            left: 50%; top: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            filter: drop-shadow(0 0 30px rgba(232,88,122,.35));
+        }
+
+        .love .block {
+            right: 0;
+            position: absolute;
+            visibility: hidden;
+        }
+
+        .love .block div {
+            width: 40px; height: 40px;
+            position: absolute;
+            background: url("heart.png") no-repeat center / contain;
+            transition: opacity .2s;
+        }
+
+        /* Entrance animation for each cloned block */
+        @keyframes pop-in {
+            0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+            60%  { transform: scale(1.2) rotate(8deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .love .block div {
+            animation: pop-in .45s cubic-bezier(.34,1.56,.64,1) both;
+        }
+
+        /* ── Title ── */
+        .title-wrap {
+            position: absolute;
+            top: 6%; left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 50;
+            animation: fade-down .9s ease both;
+        }
+        .title-wrap h1 {
+            font-family: 'Sacramento', cursive;
+            font-size: clamp(2.4rem, 6vw, 5rem);
+            color: var(--rose);
+            line-height: 1;
+            letter-spacing: .02em;
+            text-shadow: 0 2px 20px rgba(232,88,122,.3);
+        }
+        .title-wrap p {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: clamp(.7rem, 1.5vw, 1rem);
+            color: var(--gold);
+            margin-top: 4px;
+            letter-spacing: .12em;
+        }
+        @keyframes fade-down {
+            from { opacity: 0; transform: translateX(-50%) translateY(-18px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ── Footer ── */
+        .footer {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 52px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 10px;
+            gap: 0;
+        }
+
+        /* Progress lines */
+        .footer .lines {
+            width: 100%;
+            position: absolute;
+            top: 0;
+        }
+        .line-black, .line-red {
+            display: block;
+            height: 2.5px;
+        }
+        .line-black {
+            background: var(--ink);
+            width: 0;
+            animation: grow-line 12s linear forwards;
+        }
+        .line-red {
+            background: var(--rose);
+            width: 0;
+            margin-left: auto;
+            animation: grow-line 7s linear 12s forwards;
+        }
+        @keyframes grow-line {
+            from { width: 0; }
+            to   { width: 100%; }
+        }
+
+        /* Credit text */
+        .footer .credit {
+            position: relative;
+            z-index: 2;
+            font-family: 'Sacramento', cursive;
+            font-size: clamp(1rem, 2.5vw, 1.35rem);
+            color: var(--ink);
+            opacity: .75;
+            letter-spacing: .06em;
+            animation: fade-up 1.2s ease 13s both;
+        }
+        .footer .credit .heart-icon { color: var(--rose); }
+        .footer .credit .name       { color: var(--rose); font-style: italic; }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: .75; transform: translateY(0); }
+        }
+
+        /* ── Music toggle ── */
+        .music-btn {
+            position: fixed;
+            top: 18px; right: 20px;
+            z-index: 300;
+            background: rgba(255,255,255,.6);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid var(--rose-lt);
+            border-radius: 50%;
+            width: 42px; height: 42px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(232,88,122,.18);
+            transition: transform .2s, background .2s;
+        }
+        .music-btn:hover { transform: scale(1.15); background: rgba(255,255,255,.85); }
+        .music-btn.paused { filter: grayscale(.6); }
+    </style>
+</head>
+<body>
+
+<!-- Petals -->
+<div class="petals" id="petals"></div>
+
+<!-- Music -->
+<audio id="bgm" autoplay loop preload="auto">
+    <source src="1.mp3" type="audio/mpeg">
+</audio>
+<button class="music-btn" id="musicBtn" title="Toggle music">🎵</button>
+
+<!-- Title -->
+<div class="title-wrap">
+    <h1>Dear Sun</h1>
+    <p>you are my favourite constellation ✦</p>
+</div>
+
+<!-- Main -->
+<div class="container" onselectstart="return false;" unselectable="on">
+
+    <div class="body_left">
+        <img src="biubiubiu.gif" alt="" ondragstart="return false;">
+    </div>
+
+    <div class="body_center love">
+        <div class="block">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="lines">
+        <span class="line-black"></span>
+        <span class="line-red"></span>
+    </div>
+    <p class="credit">
+        made with <span class="heart-icon">♥</span> by <span class="name">Zade</span> &nbsp;—&nbsp; especially for u 🌸
+    </p>
+</div>
+
+<script>
+/* ── Petals ── */
+(function spawnPetals() {
+    const container = document.getElementById('petals');
+    const emojis = ['🌸','🌺','💮','🌷','✿','❀','🌼'];
+    for (let i = 0; i < 28; i++) {
+        const p = document.createElement('span');
+        p.className = 'petal';
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        p.style.cssText = `
+            left: ${Math.random()*100}%;
+            animation-duration: ${7 + Math.random()*12}s;
+            animation-delay: ${Math.random()*18}s;
+            font-size: ${10 + Math.random()*16}px;
+        `;
+        container.appendChild(p);
+    }
+})();
+
+/* ── Music toggle ── */
+const bgm = document.getElementById('bgm');
+const musicBtn = document.getElementById('musicBtn');
+
+// autoplay might be blocked — handle gracefully
+bgm.play().catch(() => {
+    musicBtn.classList.add('paused');
+    musicBtn.textContent = '🔇';
+});
+
+musicBtn.addEventListener('click', () => {
+    if (bgm.paused) {
+        bgm.play();
+        musicBtn.textContent = '🎵';
+        musicBtn.classList.remove('paused');
+    } else {
+        bgm.pause();
+        musicBtn.textContent = '🔇';
+        musicBtn.classList.add('paused');
+    }
+});
+
+/* ── Heart animation (love.js) ── */
+const blk_pitn = {
+    block1:  [[0,1],[0,0],[-1,0],[-1,-1]],
+    block2:  [[0,1],[0,0],[-1,0],[0,-1]],
+    block3:  [[-1,1],[0,0],[-1,0],[-1,-1]],
+    block4:  [[0,1],[0,0],[-1,0],[-1,-1]],
+    block5:  [[-1,1],[0,0],[-1,0],[0,-1]],
+    block6:  [[0,-1],[0,0],[-1,0],[1,-1]],
+    block7:  [[-1,-1],[0,0],[-1,0],[1,0]],
+    block8:  [[-1,1],[0,0],[-1,0],[-1,-1]],
+    block9:  [[0,-1],[0,0],[-1,0],[1,0]],
+    block10: [[-1,1],[0,0],[-1,0],[1,0]],
+    block11: [[2,0],[0,0],[-1,0],[1,0]],
+    block12: [[0,1],[0,0],[-1,0],[0,-1]],
+    block13: [[0,1],[0,0],[-1,0],[-1,-1]],
+    block14: [[1,1],[0,0],[-1,0],[1,0]],
+    block15: [[1,-1],[0,0],[-1,0],[1,0]],
+    block16: [[-1,-1],[0,0],[-1,0],[1,0]],
+    block17: [[0,1],[0,0],[-1,0],[0,-1]],
+    block18: [[0,1],[0,0],[-1,0],[-1,-1]],
+    block19: [[0,-1],[0,0],[-1,0],[1,0]],
+    block20: [[1,-1],[0,0],[-1,0],[1,0]],
+    block21: [[0,1],[0,0],[-1,0],[-1,-1]],
+    block22: [[1,1],[0,0],[-1,0],[1,0]],
+    block23: [[0,2],[0,0],[0,-1],[0,1]]
+};
+const offset_pitn = {
+    block1:  [5,3],  block2:  [5,1],  block3:  [3,4],  block4:  [3,2],
+    block5:  [3,-1], block6:  [2,5],  block7:  [2,1],  block8:  [1,-1],
+    block9:  [1,-3], block10: [1,2],  block11: [0,3],  block12: [0,0],
+    block13: [-1,-4],block14: [0,-2], block15: [-2,4], block16: [-2,2],
+    block17: [-2,0], block18: [-3,-2],block19: [-4,0], block20: [-3,5],
+    block21: [-5,3], block22: [-4,1], block23: [-6,1]
+};
+
+let blocks     = document.getElementsByClassName('block'),
+    block      = blocks[0],
+    love       = document.getElementsByClassName('love')[0],
+    timer      = null,
+    index      = 0,
+    clone_block;
+
+block.style.top    = '50%';
+block.style.left   = '50%';
+block.style.margin = '-20px 0 0 -20px';
+
+const block_left = parseFloat(getComputedStyle(block).left),
+      block_top  = parseFloat(getComputedStyle(block).top);
+
+function Next() {
+    if (++index >= 24) {
+        clearInterval(timer);
+        Rise();
+        return;
+    }
+
+    block.style.visibility = 'visible';
+    block.style.left = block_left + 40 * offset_pitn['block'+index][0] + 'px';
+    block.style.top  = block_top  - 40 * offset_pitn['block'+index][1] + 'px';
+
+    for (let i = 0; i < block.children.length; i++) {
+        block.children[i].style.left = blk_pitn['block'+index][i][0] * -40 + 'px';
+        block.children[i].style.top  = blk_pitn['block'+index][i][1] * -40 + 'px';
+        // stagger pop-in per child
+        block.children[i].style.animationDelay = (i * 0.06) + 's';
+    }
+
+    clone_block = block.cloneNode(true);
+    love.appendChild(clone_block);
+
+    if (love.children.length >= 24) {
+        blocks[blocks.length - 1].children[2].style.display = 'none';
+        block.style.display = 'none';
+    }
+}
+
+function Rise() {
+    let distance = 0;
+    const target = 130, speed = 1;
+    const love_top = parseFloat(getComputedStyle(love).top);
+
+    // Also add a gentle pulse on the completed heart
+    love.style.transition = 'filter .5s';
+    love.style.filter = 'drop-shadow(0 0 40px rgba(232,88,122,.6))';
+
+    const t2 = setInterval(() => {
+        distance += speed;
+        if (distance >= target) { clearInterval(t2); }
+        love.style.top = (love_top - distance) + 'px';
+    }, 22);
+}
+
+window.onload = () => {
+    setTimeout(() => {
+        timer = setInterval(Next, 280);
+    }, 12000);
+};
+</script>
+</body>
+</html>
